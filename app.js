@@ -44,6 +44,18 @@ app.use(session({
 const allRoutes = require("./routes");
 app.use("/api", allRoutes);
 
+const missionsRoutes = require("./routes/missions.routes");
+app.use("/api", missionsRoutes);
+
+const authRoutes = require("./routes/auth.routes");
+app.use("/api", authRoutes);
+
+const profileRoutes = require("./routes/profile.routes");
+app.use("/api", profileRoutes);
+
+const fileUploadRoutes = require('./routes/file-upload.routes')
+app.use("/api", fileUploadRoutes);
+
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
 
