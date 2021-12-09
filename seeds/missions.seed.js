@@ -89,3 +89,4 @@ MissionModel.insertMany([
 
 
     //4th close terminal to run seed file with node!!!     node seeds/Todo.seed.js
+    // MISSIONS SEEDED !!
