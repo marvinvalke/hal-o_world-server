@@ -53,7 +53,7 @@ app.use("/api", authRoutes);
 const profileRoutes = require("./routes/profile.routes");
 app.use("/api", profileRoutes);
 
-const fileUploadRoutes = require('./routes/file-upload.routes')
+const fileUploadRoutes = require('./routes/file.upload.routes')
 app.use("/api", fileUploadRoutes);
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes

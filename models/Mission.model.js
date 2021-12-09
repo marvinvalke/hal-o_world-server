@@ -23,10 +23,10 @@ const missionSchema = new Schema(
             type: String, 
             required: true
         },
-        creator: [{
+        reviews: [{ 
             type: Schema.Types.ObjectId, 
-            ref: 'User'
-        }]
+            ref: "Review" 
+        }],
       }
 );
 
