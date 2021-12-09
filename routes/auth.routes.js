@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const UserModel = require('../models/User.model');
 
-router.post('/authentication', (req, res) => {
+router.post('/signup', (req, res) => {
     const {username, email, password } = req.body;
     console.log(username, email, password);
  
@@ -37,7 +37,7 @@ router.post('/authentication', (req, res) => {
     // creating a salt 
     let salt = bcrypt.genSaltSync(10);
     let hash = bcrypt.hashSync(password, salt);
-    UserModel.create({name: username, email, passwordHash: hash})
+    UserModel.create({username, email, password: hash})
       .then((user) => {
         // ensuring that we don't share the hash as well with the user
         user.passwordHash = "***";
@@ -60,7 +60,7 @@ router.post('/authentication', (req, res) => {
 });
  
 // will handle all POST requests to http:localhost:5005/api/signin
-router.post('/authentication', (req, res) => {
+router.post('/signin', (req, res) => {
     const {email, password } = req.body;
 
     // -----SERVER SIDE VALIDATION ----------
@@ -84,11 +84,11 @@ router.post('/authentication', (req, res) => {
     UserModel.findOne({email})
       .then((userData) => {
            //check if passwords match
-          let doesItMatch = bcrypt.compareSync(password, userData.passwordHash)
+          let doesItMatch = bcrypt.compareSync(password, userData.password)
           //if it matches
           if (doesItMatch) {
             // req.session is the special object that is available to you
-            userData.passwordHash = "***";
+            userData.password = "***";
             req.session.loggedInUser = userData;
             res.status(200).json(userData)
           }
