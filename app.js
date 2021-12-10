@@ -56,6 +56,9 @@ app.use("/api", profileRoutes);
 const fileUploadRoutes = require('./routes/file.upload.routes')
 app.use("/api", fileUploadRoutes);
 
+const nasaRoutes = require('./routes/nasa.routes')
+app.use('/api', nasaRoutes)
+
 // const aboutRoutes = require('./routes/about.routes')
 // app.use("/api", aboutRoutes);
 
