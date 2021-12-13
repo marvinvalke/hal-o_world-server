@@ -56,7 +56,7 @@ router.get("/profile", (req, res) => {
   })
 
 // USER CAN ACCESS THE MISSIONS HE APPLYED FOR
-router.get("/profile/missions", (req, res) => {
+router.get("/profile/mymissions", (req, res) => {
     const profileId = req.session.loggedInUser._id;
     UserModel.findById(profileId)
       .populate("MissionsAdded")
@@ -64,18 +64,20 @@ router.get("/profile/missions", (req, res) => {
         res.status(200).json(response);
       })
       .catch((err) => {
-        res.status(500).json({
+        console.log(err)
+        res.status(500).json({              
+
           error: "Something went wrong",
           message: err,
         });
       });
   });
 
-router.post("/profile/missions", (req, res) =>{
+router.post("/profile/mymissions", (req, res) =>{
   const profileId = req.session.loggedInUser._id;
-  const {mission} = req.body;
-  UserModel.findById(profileId)
-      .populate("MissionsAdded", mission)
+  const {id} = req.body;
+  UserModel.findByIdAndUpdate(profileId, {$addToSet: {MissionsAdded: id}})
+      // .populate("MissionsAdded", {mission}) //, mission
       .then((response) => {
         res.status(200).json(response);
       })
@@ -85,7 +87,7 @@ router.post("/profile/missions", (req, res) =>{
           message: err,
         });
       });
-
+      
 
 });
 
