@@ -132,6 +132,9 @@ const isLoggedIn = (req, res, next) => {
 // will handle all get requests to http:localhost:5005/api/profile
 /* router.get("/profile", isLoggedIn, (req, res, next) => {
   console.log("yo joana");
+// will handle all get requests to http:localhost:5005/api/user
+router.get("/user", isLoggedIn, (req, res, next) => {
+  
   res.status(200).json(req.session.loggedInUser);
   console.log(req.session.loggedInUser);
 }); */

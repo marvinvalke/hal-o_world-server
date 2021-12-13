@@ -30,6 +30,6 @@ const missionSchema = new Schema(
       }
 );
 
-const Mission = model("Mission", missionSchema);
+const Missions = model("Missions", missionSchema);
 
-module.exports = Mission;
+module.exports = Missions;
