@@ -24,14 +24,15 @@ router.get("/profile", (req, res) => {
 
   // USER CAN EDIT HIS PROFILE
   router.patch('/profile/edit' , (req,res,next) =>{
+    console.log('we are here')
     const profileId = req.session.loggedInUser._id;
-    const {username, email, passwordHash, profilePic} = req.body
+    const {username, email, password, profilePic} = req.body
     let salt = bcrypt.genSaltSync(10);
-    let hash = bcrypt.hashSync(passwordHash, salt);
+    let hash = bcrypt.hashSync(password, salt);
     let editedProfile = {
         username,
         email,
-        passwordHash:hash,
+        password:hash,
     }
     if (profilePic) {
         editedProfile.profilePic = profilePic;
