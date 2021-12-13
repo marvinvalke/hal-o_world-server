@@ -4,6 +4,21 @@ const router = express.Router();
 let MissionsModel = require('../models/Mission.model')
 let ReviewModel = require('../models/Review.model')
 
+// middleware to check if user is loggedIn
+const isLoggedIn = (req, res, next) => {  
+     if (req.session.loggedInUser) {
+         //calls whatever is to be executed after the isLoggedIn function is over
+         next()
+     }
+     else {
+         res.status(401).json({
+             message: 'Unauthorized user',
+             code: 401,
+         })
+     };
+   };
+   
+
 router.get('/missions', (req, res) => {
     MissionsModel.find()
          .then((missions) => {
@@ -18,7 +33,7 @@ router.get('/missions', (req, res) => {
 })
 
 //this will show form to create missions
-router.post('/missions/create', (req, res) => {  
+router.post('/missions/create', isLoggedIn, (req, res) => {  
     const profileId = req.session.loggedInUser._id;
     const {name, description, image, duration, difficulty, reviews} = req.body;
     // console.log(req.body)
@@ -36,7 +51,7 @@ router.post('/missions/create', (req, res) => {
 })
 
 //this will show missions details
-router.get('/missions/:missionId', (req, res) => {
+router.get('/missions/:missionId',  (req, res) => {
     MissionsModel.findById(req.params.missionId)
      .then((response) => {
           res.status(200).json(response)
@@ -50,7 +65,7 @@ router.get('/missions/:missionId', (req, res) => {
 })
 
 //this will allow user to edit missions details
-router.patch('/missions/:id', (req, res) => {
+router.patch('/profile/mymissions/:id', isLoggedIn, (req, res) => {
     let id = req.params.id
     const {name, description, image, duration, difficulty, reviews} = req.body;
     MissionsModel.findByIdAndUpdate(id, {$set: {name, description, image, duration, difficulty, reviews}}, {new: true})
@@ -65,13 +80,14 @@ router.patch('/missions/:id', (req, res) => {
           }) 
 })
 
-router.delete('/missions/:id', (req, res) => {
-
-    MissionsModel.findByIdAndDelete(req.params.id)
+router.delete('/profile/mymissions/:id', isLoggedIn, (req, res) => {
+     let id = req.params._id
+    MissionsModel.findByIdAndDelete(id)
           .then((response) => {
                res.status(200).json(response)
           })
           .catch((err) => {
+               console.log(err)
                res.status(500).json({
                     error: 'Something went wrong',
                     message: err
@@ -79,7 +95,7 @@ router.delete('/missions/:id', (req, res) => {
           })  
 })
 
-router.get('/missions/:missionId/review', (req, res) => {
+router.get('/missions/:missionId/review', isLoggedIn, (req, res) => {
     const {missionId} = req.params;
     MissionsModel.findOne({_id: missionId})
     .populate('reviews')
@@ -99,7 +115,7 @@ router.get('/missions/:missionId/review', (req, res) => {
      }) 
 })
 
-router.post('/missions/:missionId/review', (req, res) => {
+router.post('/missions/:missionId/review',  isLoggedIn, (req, res) => {
     const userId = req.session.loggedInUser._id;
     const {rate, date, comments, missionId} = req.body;
     ReviewModel.create({rate, date, comments, missionId})
