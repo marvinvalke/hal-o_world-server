@@ -71,5 +71,22 @@ router.get("/profile/missions", (req, res) => {
       });
   });
 
+router.post("/profile/missions", (req, res) =>{
+  const profileId = req.session.loggedInUser._id;
+  const {mission} = req.body;
+  UserModel.findById(profileId)
+      .populate("MissionsAdded", mission)
+      .then((response) => {
+        res.status(200).json(response);
+      })
+      .catch((err) => {
+        res.status(500).json({
+          error: "Something went wrong",
+          message: err,
+        });
+      });
+
+
+});
 
 module.exports = router;
