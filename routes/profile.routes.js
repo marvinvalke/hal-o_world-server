@@ -89,15 +89,14 @@ router.get("/profile/mymissions", isLoggedIn, (req, res) => {
       });
   });
 
-
-//SHOWS FORM TO CREATE MISSIONS
+// FORM TO CREATE MISSIONS
 router.post('/profile/mymissions/create', isLoggedIn, (req, res) => {  
   const profileId = req.session.loggedInUser._id;
   const {name, description, image, duration, difficulty, reviews} = req.body;
   // console.log(req.body)
 
-  MissionsModel.create({name, description, image, duration, difficulty})
-        .populate("MissionsCreated")
+  MissionsModel.create({name, description, image, duration, difficulty}, {$addToSet: {MissionsCreated: id}})
+        // .populate("MissionsCreated")
         .then((response) => {
              res.status(200).json(response)
         })
