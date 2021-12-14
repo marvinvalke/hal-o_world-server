@@ -41,6 +41,9 @@ app.use(session({
 
 // 👇 Start handling routes here
 // Contrary to the views version, all routes are controlled from the routes/index.js
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+
 const allRoutes = require("./routes");
 app.use("/api", allRoutes);
 
@@ -61,6 +64,10 @@ app.use('/api', nasaRoutes)
 
 // const aboutRoutes = require('./routes/about.routes')
 // app.use("/api", aboutRoutes);
+app.use((req, res, next) => {
+	// If no routes match, send them the React HTML.
+	res.sendFile(__dirname + "/public/index.html");
+});
 
 app.use((req, res, next) => {
 	// If no routes match, send them the React HTML.
