@@ -152,7 +152,7 @@ router.get("/profile", isLoggedIn, (req, res, next) => {
 
 router.patch("/profile/:id/edit", isLoggedIn, (req, res, next) => {
   
-  const { username, email, password } = req.body;
+  const { username, email, password, profilePic } = req.body;
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(password, salt);
   const id = req.session.loggedInUser._id;
@@ -160,6 +160,7 @@ router.patch("/profile/:id/edit", isLoggedIn, (req, res, next) => {
   
   UserModel.findByIdAndUpdate(id, {$set: {
     username: username,
+    profilePic: profilePic,
     email: email,
     password: hash,
   }}, {new:true}) 
