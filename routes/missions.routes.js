@@ -32,23 +32,7 @@ router.get('/missions', (req, res) => {
          })         
 })
 
-//this will show form to create missions
-router.post('/missions/create', isLoggedIn, (req, res) => {  
-    const profileId = req.session.loggedInUser._id;
-    const {name, description, image, duration, difficulty, reviews} = req.body;
-    // console.log(req.body)
 
-    MissionsModel.create({name, description, image, duration, difficulty, reviews})
-          .then((response) => {
-               res.status(200).json(response)
-          })
-          .catch((err) => {
-               res.status(500).json({
-                    error: 'Something went wrong',
-                    message: err
-               })
-          })  
-})
 
 //this will show missions details
 router.get('/missions/:missionId',  (req, res) => {
@@ -67,36 +51,6 @@ router.get('/missions/:missionId',  (req, res) => {
      }) 
 })
 
-//this will allow user to edit missions details
-router.patch('/profile/mymissions/:id', isLoggedIn, (req, res) => {
-    let id = req.params.id
-    const {name, description, image, duration, difficulty, reviews} = req.body;
-    MissionsModel.findByIdAndUpdate(id, {$set: {name, description, image, duration, difficulty, reviews}}, {new: true})
-          .then((response) => {
-               res.status(200).json(response)
-          })
-          .catch((err) => {
-               res.status(500).json({
-                    error: 'Something went wrong',
-                    message: err
-               })
-          }) 
-})
-
-router.delete('/profile/mymissions/:id', isLoggedIn, (req, res) => {
-     let id = req.params._id
-    MissionsModel.findByIdAndDelete(id)
-          .then((response) => {
-               res.status(200).json(response)
-          })
-          .catch((err) => {
-               console.log(err)
-               res.status(500).json({
-                    error: 'Something went wrong',
-                    message: err
-               })
-          })  
-})
 
 router.get('/missions/:missionId/review', isLoggedIn, (req, res) => {
     const {missionId} = req.params;
