@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 
+
 // middleware to check if user is loggedIn
 const isLoggedIn = (req, res, next) => {  
   if (req.session.loggedInUser) {
@@ -17,6 +18,7 @@ const isLoggedIn = (req, res, next) => {
 };
 
 const UserModel = require("../models/User.model.js");
+const MissionsModel = require('../models/Mission.model')
 
 // USER CAN GO TO HIS PROFILE
 router.get("/profile", isLoggedIn, (req, res) => {
@@ -86,6 +88,59 @@ router.get("/profile/mymissions", isLoggedIn, (req, res) => {
         });
       });
   });
+
+
+//SHOWS FORM TO CREATE MISSIONS
+router.post('/profile/mymissions/create', isLoggedIn, (req, res) => {  
+  const profileId = req.session.loggedInUser._id;
+  const {name, description, image, duration, difficulty, reviews} = req.body;
+  // console.log(req.body)
+
+  MissionsModel.create({name, description, image, duration, difficulty})
+        .populate("MissionsCreated")
+        .then((response) => {
+             res.status(200).json(response)
+        })
+        .catch((err) => {
+             res.status(500).json({
+                  error: 'Something went wrong',
+                  message: err
+             })
+        })  
+})
+//EDIT/UPDATE MISSION DETAILS
+router.patch('/profile/mymissions/:id', isLoggedIn, (req, res) => {
+ let id = req.params.id
+ const {name, description, image, duration, difficulty, reviews} = req.body;
+ MissionsModel.findByIdAndUpdate(id, {$set: {name, description, image, duration, difficulty, reviews}}, {new: true})
+       .then((response) => {
+            res.status(200).json(response)
+       })
+       .catch((err) => {
+            res.status(500).json({
+                 error: 'Something went wrong',
+                 message: err
+            })
+       }) 
+})
+
+//DELETE MISSION FROM PROFILE
+router.delete('/profile/mymissions/:id', isLoggedIn, (req, res) => {
+  const {missionId} = req.params; 
+ MissionsModel.findByIdAndDelete({_id: missionId})
+       .populate("MissionsAdded")
+       .then((response) => {
+            res.status(200).json(response)
+       })
+       .catch((err) => {
+            console.log(err)
+            res.status(500).json({
+                 error: 'Something went wrong',
+                 message: err
+            })
+       })  
+})
+
 
 router.post("/profile/mymissions", isLoggedIn, (req, res) =>{
   const profileId = req.session.loggedInUser._id;
