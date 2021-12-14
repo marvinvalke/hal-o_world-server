@@ -52,11 +52,14 @@ router.post('/missions/create', isLoggedIn, (req, res) => {
 
 //this will show missions details
 router.get('/missions/:missionId',  (req, res) => {
+     console.log(req.params.missionId)
+
     MissionsModel.findById(req.params.missionId)
      .then((response) => {
           res.status(200).json(response)
      })
      .catch((err) => {
+          console.log(err)
           res.status(500).json({
                error: 'Something went wrong',
                message: err
