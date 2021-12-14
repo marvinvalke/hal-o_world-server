@@ -18,7 +18,8 @@ const isLoggedIn = (req, res, next) => {
 };
 
 const UserModel = require("../models/User.model.js");
-const MissionsModel = require('../models/Mission.model')
+const MissionsModel = require('../models/Mission.model');
+const Mongoose  = require('mongoose');
 
 // USER CAN GO TO HIS PROFILE
 router.get("/profile", isLoggedIn, (req, res) => {
@@ -91,16 +92,26 @@ router.get("/profile/mymissions", isLoggedIn, (req, res) => {
 
 // FORM TO CREATE MISSIONS
 router.post('/profile/mymissions/create', isLoggedIn, (req, res) => {  
-  const profileId = req.session.loggedInUser._id;
-  const {name, description, image, duration, difficulty, reviews} = req.body;
-  // console.log(req.body)
+  let profileId = req.session.loggedInUser._id;
+  const {name, description, image, duration, difficulty, reviews, id} = req.body;
+  console.log(req.body)
 
-  MissionsModel.create({name, description, image, duration, difficulty}, {$addToSet: {MissionsCreated: id}})
-        // .populate("MissionsCreated")
+  MissionsModel.create({name, description, image, duration, difficulty})          
         .then((response) => {
-             res.status(200).json(response)
+          UserModel.findByIdAndUpdate(profileId, {$push: {MissionsAdded : response._id }})
+          .then(() =>{
+            res.status(200).json(response)
+          })
+          .catch((err) => {
+            res.status(500).json({
+              error: 'Something went wrong',
+              message: err
+          })
+          })
+             
         })
         .catch((err) => {
+          console.log(err)
              res.status(500).json({
                   error: 'Something went wrong',
                   message: err
@@ -125,11 +136,23 @@ router.patch('/profile/mymissions/:id', isLoggedIn, (req, res) => {
 
 //DELETE MISSION FROM PROFILE
 router.delete('/profile/mymissions/:id', isLoggedIn, (req, res) => {
-  const {missionId} = req.params; 
- MissionsModel.findByIdAndDelete({_id: missionId})
-       .populate("MissionsAdded")
+  const {id} = req.params; 
+  let profileId = req.session.loggedInUser._id;
+
+ MissionsModel.findByIdAndDelete(id)
+     
        .then((response) => {
-            res.status(200).json(response)
+
+            UserModel.findByIdAndUpdate(profileId, {$pull: {MissionsAdded : id }})
+            .then(() =>{
+              res.status(200).json(response)
+            })
+            .catch((err) => {
+              res.status(500).json({
+                error: 'Something went wrong',
+                message: err
+            })
+          })
        })
        .catch((err) => {
             console.log(err)
