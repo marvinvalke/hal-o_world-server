@@ -21,10 +21,26 @@ const isLoggedIn = (req, res, next) => {
 
 router.get('/missions', (req, res) => {
     MissionsModel.find()
+          .populate('reviews')
          .then((missions) => {
-              res.status(200).json(missions)
+              let cloneMissions = JSON.parse(JSON.stringify(missions))
+             let missionsReviewed =  cloneMissions.map((elem) => {
+                 // console.log(elem)
+               let total = elem.reviews.reduce((total, reviewElem) => {
+                    return total + reviewElem.rate
+                 }, 0);
+               
+                 let averageRating = total/elem.reviews.length; 
+ 
+                 elem.rate = averageRating
+               return elem
+              })
+
+               res.status(200).json(missionsReviewed)
+              
          })
          .catch((err) => {
+              console.log(err)
               res.status(500).json({
                    error: 'Something went wrong',
                    message: err
@@ -54,7 +70,7 @@ router.get('/missions/:missionId',  (req, res) => {
 
 router.get('/profile/mymissions/:missionId/review', isLoggedIn, (req, res) => {
     const {missionId} = req.params;
-    MissionsModel.findOne(missionId)
+    MissionsModel.findById(missionId)
     .populate('reviews')
      .then((response) => {
          let review = response.reviews.map((review) => review.rate);
@@ -62,9 +78,10 @@ router.get('/profile/mymissions/:missionId/review', isLoggedIn, (req, res) => {
             return total + rating
          }, 0);
          let averageRating = total/review.length; 
-          res.status(200).json([{ rate: averageRating }])
+          res.status(200).json({ rate: averageRating })
      })
      .catch((err) => {
+          console.log(err)
           res.status(500).json({
                error: 'Something went wrong',
                message: err
@@ -72,15 +89,17 @@ router.get('/profile/mymissions/:missionId/review', isLoggedIn, (req, res) => {
      }) 
 })
 
-router.post('/profile/mymissions/:missionId/review',  isLoggedIn, (req, res) => {
+router.post('/profile/mymissions/:missionId/review', isLoggedIn, (req, res) => {
     const userId = req.session.loggedInUser._id;
+// const userId = '61b775de7fc4ab0c82bb7e3e'
     const {missionId} = req.params; 
-    const {rate, comments} = req.body;
-    ReviewModel.create({rate, comments, missionId, userId})
+    const {rate} = req.body;
+    ReviewModel.create({rate, missionId, userId})
      .then((response) => {
           // res.status(200).json(response);
 
-          MissionsModel.findByIdAndUpdate(missionId, {$push: { reviews: response._id}}) 
+          MissionsModel.findByIdAndUpdate(missionId, {$push: { reviews: response._id}})
+
           .then((response) => {
             res.status(200).json(response)
           } )          
