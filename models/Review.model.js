@@ -6,11 +6,7 @@ const reviewSchema = new Schema(
         rate: {
             type: Number, 
             required: true
-        },       
-        comments: {
-            type: String, 
-            required: true
-        },
+        },               
         missionId: {
             type: Schema.Types.ObjectId, 
             ref: 'Mission'
