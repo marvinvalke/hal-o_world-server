@@ -6,23 +6,19 @@ const reviewSchema = new Schema(
         rate: {
             type: Number, 
             required: true
-        },
-        date: {
-            type: Date, 
-            required: true
-        },
+        },       
         comments: {
             type: String, 
             required: true
         },
-        missionId: [{
+        missionId: {
             type: Schema.Types.ObjectId, 
             ref: 'Mission'
-        }],
-        userId: [{
+        },
+        userId: {
             type: Schema.Types.ObjectId, 
             ref: 'User'
-        }]
+        }
       }
 );
 

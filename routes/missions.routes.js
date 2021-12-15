@@ -52,9 +52,9 @@ router.get('/missions/:missionId',  (req, res) => {
 })
 
 
-router.get('/missions/:missionId/review', isLoggedIn, (req, res) => {
+router.get('/profile/mymissions/:missionId/review', isLoggedIn, (req, res) => {
     const {missionId} = req.params;
-    MissionsModel.findOne({_id: missionId})
+    ReviewModel.findById( missionId)
     .populate('reviews')
      .then((response) => {
          let review = response.reviews.map((review) => review.rate);
@@ -72,20 +72,27 @@ router.get('/missions/:missionId/review', isLoggedIn, (req, res) => {
      }) 
 })
 
-router.post('/missions/:missionId/review',  isLoggedIn, (req, res) => {
+router.post('/profile/mymissions/:missionId/review',  isLoggedIn, (req, res) => {
     const userId = req.session.loggedInUser._id;
-    const {rate, date, comments, missionId} = req.body;
-    ReviewModel.create({rate, date, comments, missionId})
+    const {missionId} = req.params; 
+    const {rate, comments} = req.body;
+    ReviewModel.create({rate, comments, missionId, userId})
      .then((response) => {
-          res.status(200).json(response);
+          // res.status(200).json(response);
 
-          MissionsModel.findByIdAndUpdate({missionId}) 
+          MissionsModel.findByIdAndUpdate(missionId, {$push: { reviews: response._id}}) 
           .then((response) => {
             res.status(200).json(response)
           } )          
-          
+          .catch((err) => {
+               res.status(500).json({
+                    error: 'Something went wrong',
+                    message: err
+               })
+          }) 
      })
      .catch((err) => {
+          console.log(err);
           res.status(500).json({
                error: 'Something went wrong',
                message: err
