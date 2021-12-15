@@ -54,7 +54,7 @@ router.get('/missions/:missionId',  (req, res) => {
 
 router.get('/profile/mymissions/:missionId/review', isLoggedIn, (req, res) => {
     const {missionId} = req.params;
-    ReviewModel.findById( missionId)
+    MissionsModel.findOne(missionId)
     .populate('reviews')
      .then((response) => {
          let review = response.reviews.map((review) => review.rate);
